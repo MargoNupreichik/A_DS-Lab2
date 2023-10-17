@@ -1,90 +1,96 @@
 #include "Sorts.h"
 #include <cmath>
 
-
+// +
 void SelectionSort(int* A, unsigned N)
 {
 	unsigned minIndex = 0;
-	for (unsigned i = 1; i < N - 1; i++) {
-		for (unsigned j = i + 1; j < N - 1; j++) {
+	for (unsigned i = 0; i < N - 1; i++) {
+		for (unsigned j = i + 1; j < N; j++) {
 			if (*(A + j) < *(A + minIndex)) {
 				minIndex = j;
 			}
 		}
-		swap(A[i], A[minIndex]);
+		int* pa = &(*(A + i));
+		int* pb = &(*(A + minIndex));
+		swap(pa, pb);
 	}
 }
-
+// +
 void InsertionSort(int* A, unsigned begin, unsigned end)
 {
-	int key = 0;
-	unsigned inner = 0;
-	for (unsigned i = begin + 1; i < end; i++) {
-		key = *(A + 1);
-		inner = i - 1;
-		while (inner >= 0 && *(A + inner) > key) {
-			swap(A[inner + 1], A[inner]);
-			inner = inner - 1;
+	int buff = A[begin];
+	int keybuff = begin;
+	for (unsigned i = begin + 1; i < N; i++) {
+		buff = A[i];
+		keybuff = i - 1;
+		while (keybuff >= 0 && A[keybuff] > buff)
+		{
+			int* pa = &(*(A + keybuff + 1));
+			int* pb = &(*(A + keybuff));
+			swap(pa, pb);
+			swap(pb, &buff);
+			keybuff--;
 		}
-		*(A + inner + 1) = key;
 	}
 }
-
+// +
 void BubbleSort(int* A, unsigned N)
 {
-	int buff = 0;
-	
-	for (unsigned i = 0; i < N; i++) {
-		for (unsigned j = 0; j < N - 1; j++) {
-			if (*(A+j) < *(A + j + 1))
+	for (unsigned i = 0; i < N - 1; i++) {
+		for (unsigned j = 0; j < N - 1 - i; j++) {
+			if (*(A + j) > *(A + j + 1))
 			{
-				swap(A[j], A[j + 1]);
+				int* pa = &(*(A + j));
+				int* pb = &(*(A + j + 1));
+				swap(pa, pb);
 			}
 		}
 	}
-	
-
 }
-
-void MergeSort(int* A, unsigned left, unsigned right)
+// +
+void MergeSort(int* A, unsigned low, unsigned high)
 {
-	if (left >= right) {
-		return;
-	}
-
-	unsigned mid = left + (right - left) / 2;
-	
-	MergeSort(A, left, mid);
-	MergeSort(A, mid + 1, right);
-	
-	int *leftArr = new int[mid - left + 1]; 
-	int *rightArr = new int[right - mid];
-	
-	for (int i = 0; i <= mid - left; i++) {
-		leftArr[i] = A[left + i];
-	}
-	
-	for (int i = 0; i < right - mid; i++) {
-		rightArr[i] = A[mid + 1 + i];
-	}
-	
-	merge(A, leftArr, mid - left + 1, rightArr, right - mid);
-}
-
-void QuickSort(int* A, unsigned start, unsigned end) {
-	if (start >= end)
+	if (low >= high)
 		return;
 
-	// partitioning
-	unsigned p = partition(A, start, end);
-
-	// left part
-	QuickSort(A, start, p - 1);
-
-	// right part
-	QuickSort(A, p + 1, end);
+	int mid = low + (high - low) / 2;
+	MergeSort(A, low, mid);
+	MergeSort(A, mid + 1, high);
+	merge(A, low, mid, high);
 }
+// +
+void QuickSort(int* A, unsigned size) 
+{
+	int i = 0;
+	int j = size - 1;
+	int mid = A[size / 2];
 
+	do {
+		while (A[i] < mid) {
+			i++;
+		}
+		while (A[j] > mid) {
+			j--;
+		}
+		if (i <= j) {
+			int tmp = A[i];
+			A[i] = A[j];
+			A[j] = tmp;
+
+			i++;
+			j--;
+		}
+	} while (i <= j);
+
+	if (j > 0) {
+		QuickSort(A, j + 1);
+	}
+	if (i < size) {
+		QuickSort(&(A[i]), size - i);
+	}
+}
+// +
 void ShellSort(int* A, unsigned N)
 {
 	for (unsigned gap = N / 2; gap > 0; gap /= 2)
@@ -101,24 +107,22 @@ void ShellSort(int* A, unsigned N)
 		}
 	}
 }
-
+// +
 void HeapSort(int* A, unsigned begin, unsigned end)
 {
-	for (unsigned i = end / 2 - 1; i >= begin; i--) heapify(A, end, i);
+	for (int i = N / 2 - 1; i >= 0; i--)
+		heapify(A, N, i);
 
-	// one by one extract element from heap
-	for (unsigned i = end - 1; i >= begin; i--) {
-		// current root to end
-		swap(A[begin], A[i]);
-
-		// max heapify
-		heapify(A, i, begin);
+	for (int i = N - 1; i >= 0; i--) {
+		int* pa = &(*(A));
+		int* pb = &(*(A + i));
+		swap(pa, pb);
+		heapify(A, i, 0);
 	}
 }
-
+// +
 void TimSort(int* A, unsigned N)
 {
-	// sorting individual subarrays of size RUN
 	for (int i = 0; i < N; i += RUN)
 		InsertionSort(A, i, minn((i + RUN - 1), (N - 1)));
 
@@ -140,112 +144,136 @@ void TimSort(int* A, unsigned N)
 				for (int i = 0; i < right - mid; i++) {
 					rightArr[i] = A[mid + 1 + i];
 				}
-				merge(A, leftArr, mid - left + 1, rightArr, right - mid);
 			}
 		}
 	}
 }
+// +
+void IntroSort(int* data, unsigned begin, unsigned count) {
+	int partitionSize = partition(data, 0, count - 1);
 
-void IntroSort(int* A, unsigned* begin, unsigned* end, int maxdepth)
-{
-	unsigned size = end - begin;
-	
-	if (size < 16) {
-		InsertionSort(A, *begin, *end);
-		return;
+	if (partitionSize < 16)
+	{
+		InsertionSort(data, 0, count);
 	}
-
-	if (maxdepth == 0) {
-		heapify(A, *begin, *(end) + 1);
-		HeapSort(A, *begin, *(end) + 1);
-		return;
+	else if (partitionSize > (2 * log(count)))
+	{
+		HeapSort(data, 0, count);
 	}
-
-	unsigned* pivot = medianofthree(begin, begin + size / 2, end);
-	
-	IntroSort(A, begin, *(begin) + pivot - 1, maxdepth - 1);
-	IntroSort(A, *(begin) + pivot + 1, end, maxdepth - 1);
-
+	else
+	{
+		QuickSort(data, count - 1);
+	}
 }
 
 
-void swap(int& a, int& b) {
-	int buff = a;
-	a = b;
-	b = buff;
+void swap(int* a, int* b) {
+	int temp_a = *a;
+	*a = *b;
+	*b = temp_a;
 }
 
-void merge(int *A, int *left, int leftSize, int* right, int rightSize) {
-	unsigned i = 0, j = 0, k = 0;
-	while (i < leftSize && j < rightSize) {
-		if (left[i] <= right[j]) {
-			A[k++] = left[i++];
+void merge(int* A, int low, int mid, int high) {
+	int const subArrayOne = mid - low + 1;
+	int const subArrayTwo = high - mid;
+
+	// Create temp arrays
+	auto* leftArray = new int[subArrayOne],
+		* rightArray = new int[subArrayTwo];
+
+	// Copy data to temp arrays leftArray[] and rightArray[]
+	for (auto i = 0; i < subArrayOne; i++)
+		leftArray[i] = A[low + i];
+	for (auto j = 0; j < subArrayTwo; j++)
+		rightArray[j] = A[mid + 1 + j];
+
+	auto indexOfSubArrayOne = 0, indexOfSubArrayTwo = 0;
+	int indexOfMergedArray = low;
+
+	// Merge the temp arrays back into array[left..right]
+	while (indexOfSubArrayOne < subArrayOne
+		&& indexOfSubArrayTwo < subArrayTwo) {
+		if (leftArray[indexOfSubArrayOne]
+			<= rightArray[indexOfSubArrayTwo]) {
+			A[indexOfMergedArray]
+				= leftArray[indexOfSubArrayOne];
+			indexOfSubArrayOne++;
 		}
 		else {
-			A[k++] = right[j++];
+			A[indexOfMergedArray]
+				= rightArray[indexOfSubArrayTwo];
+			indexOfSubArrayTwo++;
 		}
+		indexOfMergedArray++;
 	}
-	while (i < leftSize) {
-		A[k++] = left[i++];
+
+	// Copy the remaining elements of
+	// left[], if there are any
+	while (indexOfSubArrayOne < subArrayOne) {
+		A[indexOfMergedArray]
+			= leftArray[indexOfSubArrayOne];
+		indexOfSubArrayOne++;
+		indexOfMergedArray++;
 	}
-	while (j < rightSize) {
-		A[k++] = right[j++];
+
+	// Copy the remaining elements of
+	// right[], if there are any
+	while (indexOfSubArrayTwo < subArrayTwo) {
+		A[indexOfMergedArray]
+			= rightArray[indexOfSubArrayTwo];
+		indexOfSubArrayTwo++;
+		indexOfMergedArray++;
 	}
+	delete[] leftArray;
+	delete[] rightArray;
 }
 
-unsigned partition(int* A, unsigned start, unsigned end)
+unsigned partition(int* A, unsigned left, unsigned right)
 {
-	int pivot = A[start];
+	int pivot = A[right];
+	int temp;
+	int i = left;
 
-	unsigned count = 0;
-	for (unsigned i = start + 1; i <= end; i++) {
-		if (A[i] <= pivot)
-			count++;
-	}
-
-	// Giving pivot element its correct position
-	unsigned pivotIndex = start + count;
-	swap(A[pivotIndex], A[start]);
-
-	// Sorting left and right parts of the pivot element
-	unsigned i = start, j = end;
-
-	while (i < pivotIndex && j > pivotIndex) {
-
-		while (A[i] <= pivot) {
+	for (int j = left; j < right; ++j)
+	{
+		if (A[j] <= pivot)
+		{
+			temp = A[j];
+			A[j] = A[i];
+			A[i] = temp;
 			i++;
 		}
-
-		while (A[j] > pivot) {
-			j--;
-		}
-
-		if (i < pivotIndex && j > pivotIndex) {
-			swap(A[i++], A[j--]);
-		}
 	}
 
-	return pivotIndex;
+	A[right] = A[i];
+	A[i] = pivot;
+
+	return i;
 }
 
 void heapify(int* A, int N, int i)
 {
-	unsigned largest = i; // Initialize largest as root Since we are using 0 based indexing
-	unsigned l = 2 * i + 1; // left = 2*i + 1
-	unsigned r = 2 * i + 2; // right = 2*i + 2
+	int largest = i;
+	int l = 2 * i + 1;
+	int r = 2 * i + 2;
 
-	// If left child is larger than root
+	// If the left child is larger than the root.
 	if (l < N && A[l] > A[largest])
 		largest = l;
 
-	// If right child is larger than largest so far
+	// If the right child is larger.
 	if (r < N && A[r] > A[largest])
 		largest = r;
 
-	// If largest is not root
-	if (largest != i) {
-		swap(A[i], A[largest]);
+	int* pa = nullptr;
+	int* pb = nullptr;
 
+	// If the root is not the largest.
+	if (largest != i) {
+		pa = &(*(A + i)); pb = &(*(A + largest));
+		swap(pa, pb);
+
+		// Heapifying the sub-tree repeatedly.
 		heapify(A, N, largest);
 	}
 }
@@ -255,23 +283,23 @@ int minn(int a, int b) {
 	else return b;
 }
 
-unsigned* medianofthree(unsigned* a, unsigned* b, unsigned* c)
+unsigned medianofthree(unsigned a, unsigned b, unsigned c)
 {
-	if (*a < *b && *b < *c)
-		return (b);
+	if (a < b && b < c)
+		return b;
 
-	if (*a < *c && *c <= *b)
-		return (c);
+	if (a < c && c <= b)
+		return c;
 
-	if (*b <= *a && *a < *c)
-		return (a);
+	if (b <= a && a < c)
+		return a;
 
-	if (*b < *c && *c <= *a)
-		return (c);
+	if (b < c && c <= a)
+		return c;
 
-	if (*c <= *a && *a < *b)
-		return (a);
+	if (c <= a && a < b)
+		return a;
 
-	if (*c <= *b && *b <= *a)
-		return (b);
+	if (c <= b && b <= a)
+		return b;
 }
