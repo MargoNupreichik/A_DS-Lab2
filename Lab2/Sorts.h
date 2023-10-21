@@ -11,7 +11,7 @@
 //•	IntroSort
 
 const int RUN = 32;
-const int N = 100;
+const int M = 100;
 
 void swap(int* a, int* b);
 void merge(int* A, int low, int mid, int high);

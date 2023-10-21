@@ -2,11 +2,11 @@
 #include <cmath>
 
 // +
-void SelectionSort(int* A, unsigned N)
+void SelectionSort(int* A, unsigned size)
 {
 	unsigned minIndex = 0;
-	for (unsigned i = 0; i < N - 1; i++) {
-		for (unsigned j = i + 1; j < N; j++) {
+	for (unsigned i = 0; i < size - 1; i++) {
+		for (unsigned j = i + 1; j < size; j++) {
 			if (*(A + j) < *(A + minIndex)) {
 				minIndex = j;
 			}
@@ -21,7 +21,7 @@ void InsertionSort(int* A, unsigned begin, unsigned end)
 {
 	int buff = A[begin];
 	int keybuff = begin;
-	for (unsigned i = begin + 1; i < N; i++) {
+	for (unsigned i = begin + 1; i < end; i++) {
 		buff = A[i];
 		keybuff = i - 1;
 		while (keybuff >= 0 && A[keybuff] > buff)
@@ -30,15 +30,15 @@ void InsertionSort(int* A, unsigned begin, unsigned end)
 			int* pb = &(*(A + keybuff));
 			swap(pa, pb);
 			swap(pb, &buff);
-			keybuff--;
+			--keybuff;
 		}
 	}
 }
 // +
-void BubbleSort(int* A, unsigned N)
+void BubbleSort(int* A, unsigned size)
 {
-	for (unsigned i = 0; i < N - 1; i++) {
-		for (unsigned j = 0; j < N - 1 - i; j++) {
+	for (unsigned i = 0; i < size - 1; i++) {
+		for (unsigned j = 0; j < size - 1 - i; j++) {
 			if (*(A + j) > *(A + j + 1))
 			{
 				int* pa = &(*(A + j));
@@ -91,11 +91,11 @@ void QuickSort(int* A, unsigned size)
 	}
 }
 // +
-void ShellSort(int* A, unsigned N)
+void ShellSort(int* A, unsigned size)
 {
-	for (unsigned gap = N / 2; gap > 0; gap /= 2)
+	for (unsigned gap = size / 2; gap > 0; gap /= 2)
 	{
-		for (unsigned i = gap; i < N; i += 1)
+		for (unsigned i = gap; i < size; i += 1)
 		{
 			int temp = A[i];
 
@@ -110,10 +110,10 @@ void ShellSort(int* A, unsigned N)
 // +
 void HeapSort(int* A, unsigned begin, unsigned end)
 {
-	for (int i = N / 2 - 1; i >= 0; i--)
-		heapify(A, N, i);
+	for (int i = end / 2 - 1; i >= 0; i--)
+		heapify(A, end, i);
 
-	for (int i = N - 1; i >= 0; i--) {
+	for (int i = end - 1; i >= 0; i--) {
 		int* pa = &(*(A));
 		int* pb = &(*(A + i));
 		swap(pa, pb);
@@ -121,29 +121,21 @@ void HeapSort(int* A, unsigned begin, unsigned end)
 	}
 }
 // +
-void TimSort(int* A, unsigned N)
+void TimSort(int* A, unsigned sizeup)
 {
-	for (int i = 0; i < N; i += RUN)
-		InsertionSort(A, i, minn((i + RUN - 1), (N - 1)));
+	for (int i = 0; i < sizeup; i += RUN)
+		InsertionSort(A, i, minn((i + RUN - 1), (sizeup - 1)));
 
-	for (int size = RUN; size < N; size = 2 * size) {
+	for (int size = RUN; size < sizeup; size *= 2) { // при попытке отследить, что происходит при заходе в цикл, программа падает
+		// соообщение следующее: запись в память вне буфера
 
-		for (unsigned left = 0; left < N; left += 2 * size) {
+		for (unsigned left = 0; left < sizeup; left += 2 * size) {
 
 			int mid = left + size - 1;
-			int right = minn((left + 2 * size - 1), (N - 1));
+			int right = minn((left + 2 * size - 1), (sizeup - 1));
 
 			if (mid < right) {
-				int* leftArr = new int[mid - left + 1];
-				int* rightArr = new int[right - mid];
-
-				for (int i = 0; i <= mid - left; i++) {
-					leftArr[i] = A[left + i];
-				}
-
-				for (int i = 0; i < right - mid; i++) {
-					rightArr[i] = A[mid + 1 + i];
-				}
+				merge(A, left, mid, right);  
 			}
 		}
 	}
@@ -251,18 +243,18 @@ unsigned partition(int* A, unsigned left, unsigned right)
 	return i;
 }
 
-void heapify(int* A, int N, int i)
+void heapify(int* A, int size, int i)
 {
 	int largest = i;
 	int l = 2 * i + 1;
 	int r = 2 * i + 2;
 
 	// If the left child is larger than the root.
-	if (l < N && A[l] > A[largest])
+	if (l < size && A[l] > A[largest])
 		largest = l;
 
 	// If the right child is larger.
-	if (r < N && A[r] > A[largest])
+	if (r < size && A[r] > A[largest])
 		largest = r;
 
 	int* pa = nullptr;
@@ -274,13 +266,13 @@ void heapify(int* A, int N, int i)
 		swap(pa, pb);
 
 		// Heapifying the sub-tree repeatedly.
-		heapify(A, N, largest);
+		heapify(A, size, largest);
 	}
 }
 
 int minn(int a, int b) {
-	if (a > b) return a;
-	else return b;
+	if (a > b) return b;
+	else return a;
 }
 
 unsigned medianofthree(unsigned a, unsigned b, unsigned c)

@@ -11,7 +11,7 @@
 
 using namespace std;
 
-int* copyarray(int array[]);
+int* copyarray(int array[], unsigned length);
 
 int* reversedarray(int size);
 int* sortedarray(int size);
@@ -20,7 +20,7 @@ int* nearlysortedarray(int size);
 
 bool ismember(int* arr, int size, int comp);
 
-void printarray(int arr[], unsigned N);
+void printarray(int arr[], unsigned M);
 
 const int numarr = 10;
 const int eacharr = 4;
@@ -32,42 +32,32 @@ int main()
 	
 	short currentMethod = 0;
 	
-	// генерация указателей на массивы разных размеров. каждый указатель указывает на 4 массива.
-	int* myarrays[numarr][eacharr];
-
+	// генерация указателей на массивы разных размеров по типам массивов.
+	int** reversedarrays = new int* [numarr];
+	int** sortedarrays = new int* [numarr];
+	int** nearlysortedarrays = new int* [numarr];
+	int** randomarrays = new int* [numarr];
+	// заполнение обратно отсортированных
 	for (int i = 0; i < numarr; i++) {
-		for (int j = 0; j < eacharr; j++) {
-			if (j == 0) {
-				// reverse
-				myarrays[i][j] = reversedarray((i + 1) * N);
-			}
-			else if (j == 1) {
-				// sorted
-				myarrays[i][j] = sortedarray((i + 1) * N);
-			}
-			else if (j == 2) {
-				// nearly sorted
-				myarrays[i][j] = nearlysortedarray((i + 1) * N);
-			}
-			else if (j == 3) {
-				// random array
-				myarrays[i][j] = randomarray((i + 1) * N);
-			}
-		}
+		reversedarrays[i] = reversedarray((i+1)*M);
 	}
-	
-
-	int ReverseSorted[N] = { 100, 99, 98, 97, 96, 95, 94, 93, 92, 91, 90, 89, 88, 87, 
-		86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 
-		68, 67, 66, 65, 64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 
-		50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 
-		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 
-		14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
+	// заполнение отсортированных
+	for (int i = 0; i < numarr; i++) {
+		sortedarrays[i] = sortedarray((i + 1) * M);
+	}
+	// заполнение почти отсортированных
+	for (int i = 0; i < numarr; i++) {
+		nearlysortedarrays[i] = nearlysortedarray((i + 1) * M);
+	}
+	// заполнение рандомное
+	for (int i = 0; i < numarr; i++) {
+		randomarrays[i] = randomarray((i + 1) * M);
+	}
 
 	cout << "Введите число от 1 по 9 (число соответствует порядковому\nномеру из списка реализуемых сортировок)." << endl;
 	cout << "Если вы хотите завершить работу программы, введите 0." << endl;
 	
-	cout.precision(10);
+	cout.precision(8);
 	cin >> currentMethod;
 	
 	clock_t start; 
@@ -77,121 +67,658 @@ int main()
 
 	while (currentMethod) {
 
-		start = clock();
-		int* newArray1 = copyarray(ReverseSorted);
-		timecopy = double(clock() - start);
-		
-		start = clock();
-		delete[] newArray1;
-		timedelete = double(clock() - start);
-
 		cout << "\nСоздана копия массива." << endl;
 
 		switch (currentMethod) {
 		case 1:
 		{
 			cout << "\nSelectionSort" << endl;
-			start = clock();
-			for (int i = 0; i < 1000; i++) {
-				newArray1 = copyarray(ReverseSorted);
-				SelectionSort(newArray1, N);
+			cout << "Reverse sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j+1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
 				delete[] newArray1;
+				timedelete = double(clock() - start);
+
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(reversedarrays[j], (j+1) * M);
+					SelectionSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
 			}
-			time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
-			cout << " Время выполнения: " << fixed << time << endl;
+			cout << "Sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+					SelectionSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
+			}
+			cout << "Nearly sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(nearlysortedarrays[j], (j + 1) * M);
+					SelectionSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
+			}
+			cout << "Random" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(randomarrays[j], (j + 1) * M);
+					SelectionSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
+			}
 		}
 		break;
 		case 2:
 			cout << "\nInsertionSort" << endl;
-			start = clock();
-
-			for (int i = 0; i < 1000; i++) {
-				newArray1 = copyarray(ReverseSorted);
-				InsertionSort(newArray1, 0, N);
+			cout << "Reverse sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
 				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(reversedarrays[j], (j + 1) * M);
+					InsertionSort(newArray1, 0, (j + 1)* M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
 			}
-			time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
-			cout << "Время выполнения: " << fixed << time << endl;
-		
+			cout << "Sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+					InsertionSort(newArray1, 0, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			cout << "Nearly sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(nearlysortedarrays[j], (j + 1) * M);
+					InsertionSort(newArray1, 0, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			cout << "Random" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(randomarrays[j], (j + 1) * M);
+					InsertionSort(newArray1, 0, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
+			}
+			
 		break;
 		case 3:
 			cout << "\nBubbleSort" << endl;
-			start = clock();
-			for (int i = 0; i < 1000; i++) {
-				newArray1 = copyarray(ReverseSorted);
-				BubbleSort(newArray1, N);
+			cout << "Reverse sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
 				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(reversedarrays[j], (j + 1) * M);
+					BubbleSort(newArray1, (j + 1)* M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
 			}
-			time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
-			cout << " Время выполнения: " << fixed << time << endl;
+			cout << "Sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+					BubbleSort(newArray1, (j + 1)* M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
+			}
+			cout << "Nearly sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(nearlysortedarrays[j], (j + 1) * M);
+					BubbleSort(newArray1, (j + 1)* M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
+			}
+			cout << "Random" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(randomarrays[j], (j + 1) * M);
+					BubbleSort(newArray1, (j + 1)* M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
+			}
+			
 			break;
 		case 4:
 			cout << "\nMergeSort" << endl;
-			start = clock();
-			for (int i = 0; i < 1000; i++) {
-				newArray1 = copyarray(ReverseSorted);
-				MergeSort(newArray1, 0, N - 1);
+			cout << "Reverse sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
 				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(reversedarrays[j], (j + 1) * M);
+					MergeSort(newArray1, 0, (j + 1) * M - 1);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
 			}
-			time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
-			cout << "Время выполнения: " << fixed << time << endl;
+			cout << "Sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+					MergeSort(newArray1, 0, (j + 1) * M - 1);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
+			}
+			cout << "Nearly sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(nearlysortedarrays[j], (j + 1) * M);
+					MergeSort(newArray1, 0, (j + 1) * M - 1);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
+			}
+			cout << "Random" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 100; i++) {
+					newArray1 = copyarray(randomarrays[j], (j + 1) * M);
+					MergeSort(newArray1, 0, (j + 1) * M - 1);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 100 * timecopy - 100 * timedelete) / 100);
+				cout << fixed << time << endl;
+			}
 			break;
 		case 5:
 			cout << "\nQuickSort" << endl;
-			start = clock();
-			for (int i = 0; i < 1000; i++) {
-				newArray1 = copyarray(ReverseSorted);
-				QuickSort(newArray1, N);
+			cout << "Reverse sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
 				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(reversedarrays[j], (j + 1) * M);
+					QuickSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
 			}
-			time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
-			cout << "Время выполнения: " << fixed << time << endl;
+			cout << "Sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+					QuickSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			cout << "Nearly sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(nearlysortedarrays[j], (j + 1) * M);
+					QuickSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			cout << "Random" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(randomarrays[j], (j + 1) * M);
+					QuickSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
 		
 		break;
 		case 6:
 			cout << "\nShellSort" << endl;
-			start = clock();
-			for (int i = 0; i < 1000; i++) {
-				newArray1 = copyarray(ReverseSorted);
-				ShellSort(newArray1, N);
+			cout << "Reverse sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
 				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(reversedarrays[j], (j + 1) * M);
+					ShellSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
 			}
-			time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
-			cout << "Время выполнения: " << fixed << time << endl;
+			cout << "Sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+					ShellSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			cout << "Nearly sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(nearlysortedarrays[j], (j + 1) * M);
+					ShellSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			cout << "Random" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(randomarrays[j], (j + 1) * M);
+					ShellSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+
 		break;
 		case 7:
 			cout << "\nHeapSort" << endl;
-			start = clock();
-			for (int i = 0; i < 1000; i++) {
-				newArray1 = copyarray(ReverseSorted);
-				HeapSort(newArray1, 0, N);
+			cout << "Reverse sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
 				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(reversedarrays[j], (j + 1) * M);
+					HeapSort(newArray1, 0, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
 			}
-			time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
-			cout << "Время выполнения: " << fixed << time << endl;
+			cout << "Sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+					HeapSort(newArray1, 0, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			cout << "Nearly sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(nearlysortedarrays[j], (j + 1) * M);
+					HeapSort(newArray1, 0,(j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			cout << "Random" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(randomarrays[j], (j + 1) * M);
+					HeapSort(newArray1, 0, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			
 		break;
 		case 8:
 			cout << "\nTimSort" << endl;
-			start = clock();
-			for (int i = 0; i < 1000; i++) {
-				newArray1 = copyarray(ReverseSorted);
-				TimSort(newArray1, N);
+			cout << "Reverse sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
 				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(reversedarrays[j], (j + 1) * M);
+					TimSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
 			}
-			time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
-			cout << "Время выполнения: " << fixed << time << endl;
+			cout << "Sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+					TimSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			cout << "Nearly sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(nearlysortedarrays[j], (j + 1) * M);
+					TimSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			cout << "Random" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(randomarrays[j], (j + 1) * M);
+					TimSort(newArray1, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			
 			break;
 		case 9:
 			cout << "\nIntroSort" << endl;
-			start = clock();
-			for (int i = 0; i < 1000; i++) {
-				newArray1 = copyarray(ReverseSorted);
-				IntroSort(newArray1, 0, N);
+			cout << "Reverse sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
 				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(reversedarrays[j], (j + 1) * M);
+					IntroSort(newArray1, 0, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout  << fixed << time << endl;
 			}
-			time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+			cout << "Sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+					IntroSort(newArray1, 0, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout << fixed << time << endl;
+			}
+			cout << "Nearly sorted" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(nearlysortedarrays[j], (j + 1) * M);
+					IntroSort(newArray1, 0, (j + 1) * M - 1);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout  << fixed << time << endl;
+			}
+			cout << "Random" << endl;
+			for (int j = 0; j < numarr; j++) {
+				start = clock();
+				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				timecopy = double(clock() - start);
+				start = clock();
+				delete[] newArray1;
+				timedelete = double(clock() - start);
+				start = clock();
+				for (int i = 0; i < 1000; i++) {
+					newArray1 = copyarray(randomarrays[j], (j + 1) * M);
+					IntroSort(newArray1, 0, (j + 1) * M);
+					delete[] newArray1;
+				}
+				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
+				cout <<  fixed << time << endl;
+			}
 
-			cout << "Время выполнения: " << fixed << time << endl;
 			break;
 		case 0:
 			cout << "\nРабота программы завершена.";
@@ -203,12 +730,31 @@ int main()
 		cin >> currentMethod;
 	}
 
-	for (int i = 0; i < numarr; i++) {
-		for (int j = 0; j < eacharr; j++) {
-			delete[] myarrays[i][j];
+	// очистка памяти (! здесь проблема при попытке очистить)
+	for (int i = 0; i < numarr; ++i) {
+		if (reversedarrays[i] != NULL) {
+			delete reversedarrays[i];
+			reversedarrays[i] = NULL;
 		}
 	}
-
+	for (int i = 0; i < numarr; ++i) {
+		if (sortedarrays[i] != NULL) {
+			delete sortedarrays[i];
+			sortedarrays[i] = NULL;
+		}
+	}
+	for (int i = 0; i < numarr; ++i) {
+		if (nearlysortedarrays[i] != NULL) {
+			delete nearlysortedarrays[i];
+			nearlysortedarrays[i] = NULL;
+		}
+	}
+	for (int i = 0; i < numarr; ++i) {
+		if (randomarrays[i] != NULL) {
+			delete randomarrays[i];
+			randomarrays[i] = NULL;
+		}
+	}
 }
 
 void printarray(int arr[], unsigned N)
@@ -219,9 +765,9 @@ void printarray(int arr[], unsigned N)
 	}
 }
 
-int* copyarray(int array[]) {
-	int* newArr = new int[N];
-	for (unsigned i = 0; i < N; i++) {
+int* copyarray(int array[], unsigned length) {
+	int* newArr = new int[length];
+	for (unsigned i = 0; i < length; i++) {
 		*(newArr + i) = array[i];
 	}
 	return newArr;
