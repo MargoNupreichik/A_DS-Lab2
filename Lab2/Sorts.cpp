@@ -90,8 +90,8 @@ void QuickSort(int* A, unsigned size)
 		QuickSort(&(A[i]), size - i);
 	}
 }
-// +
-void ShellSort(int* A, unsigned size)
+// + Øוככ
+void ShellSort1(int* A, unsigned size)
 {
 	for (unsigned gap = size / 2; gap > 0; gap /= 2)
 	{
@@ -105,6 +105,38 @@ void ShellSort(int* A, unsigned size)
 
 			A[j] = temp;
 		}
+	}
+}
+// Ñוהזגטך
+void ShellSort2(int* A, unsigned l, unsigned r)
+{
+	int h;
+	for (h = 1; h <= (r - l) / 9; h = 3 * h + 1);
+	for (; h > 0; h /= 3)
+		for (int i = l + h; i <= r; i++)
+		{
+			int j = i; int v = A[i];
+			while (j >= l + h && v < A[j - h])
+			{
+				A[j] = A[j - h]; j -= h;
+			}
+			A[j] = v;
+		}
+}
+// Õטבבאנה
+void ShellSort3(int* A, unsigned size) {
+	for (int i = 1; i < size; i++) {
+		int d = exp2(i) - 1;
+		if (d <= size)  
+			for (int k = 0; k < size - d; k++) {
+				int j = k;
+				while (j >= 0 && A[j] > A[j + d]) {
+					int number = A[j];
+					A[j] = A[j + d];
+					A[j + d] = number;
+					j--;
+				}
+			}
 	}
 }
 // +
