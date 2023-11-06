@@ -515,12 +515,20 @@ int main()
 				start = clock();
 				delete[] newArray1;
 				timedelete = double(clock() - start);
+
+				// создание массива с промежутками
+				unsigned* sedgewicksize = new unsigned();
+				unsigned* gaps = sedgewickgaps((j + 1) * M, sedgewicksize);
+
 				start = clock();
 				for (int i = 0; i < 1000; i++) {
 					newArray1 = copyarray(reversedarrays[j], (j + 1) * M);
-					ShellSort2(newArray1, 0, (j + 1) * M - 1);
+					ShellSort2(newArray1, gaps, (j + 1)* M, sedgewicksize);
 					delete[] newArray1;
 				}
+
+				delete[] gaps; delete sedgewicksize;
+
 				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
 				cout << fixed << time << endl;
 			}
@@ -532,29 +540,43 @@ int main()
 				start = clock();
 				delete[] newArray1;
 				timedelete = double(clock() - start);
+				// создание массива с промежутками
+				unsigned* sedgewicksize = new unsigned();
+				unsigned* gaps = sedgewickgaps((j + 1) * M, sedgewicksize);
+
 				start = clock();
 				for (int i = 0; i < 1000; i++) {
 					newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
-					ShellSort2(newArray1, 0, (j + 1) * M - 1);
+					ShellSort2(newArray1, gaps, (j + 1) * M, sedgewicksize);
 					delete[] newArray1;
 				}
+
+				delete[] gaps; delete sedgewicksize;
+
 				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
 				cout << fixed << time << endl;
 			}
 			cout << "Nearly sorted" << endl;
 			for (int j = 0; j < numarr; j++) {
 				start = clock();
-				int* newArray1 = copyarray(sortedarrays[j], (j + 1) * M);
+				int* newArray1 = copyarray(nearlysortedarrays[j], (j + 1) * M);
 				timecopy = double(clock() - start);
 				start = clock();
 				delete[] newArray1;
 				timedelete = double(clock() - start);
+				// создание массива с промежутками
+				unsigned* sedgewicksize = new unsigned();
+				unsigned* gaps = sedgewickgaps((j + 1) * M, sedgewicksize);
+
 				start = clock();
 				for (int i = 0; i < 1000; i++) {
 					newArray1 = copyarray(nearlysortedarrays[j], (j + 1) * M);
-					ShellSort2(newArray1, 0, (j + 1)* M - 1);
+					ShellSort2(newArray1, gaps, (j + 1) * M, sedgewicksize);
 					delete[] newArray1;
 				}
+
+				delete[] gaps; delete sedgewicksize;
+
 				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
 				cout << fixed << time << endl;
 			}
@@ -566,12 +588,19 @@ int main()
 				start = clock();
 				delete[] newArray1;
 				timedelete = double(clock() - start);
+				// создание массива с промежутками
+				unsigned* sedgewicksize = new unsigned();
+				unsigned* gaps = sedgewickgaps((j + 1) * M, sedgewicksize);
+
 				start = clock();
 				for (int i = 0; i < 1000; i++) {
-					newArray1 = copyarray(randomarrays[j], (j + 1) * M);
-					ShellSort2(newArray1, 0, (j + 1)* M - 1);
+					newArray1 = copyarray(reversedarrays[j], (j + 1) * M);
+					ShellSort2(newArray1, gaps, (j + 1) * M, sedgewicksize);
 					delete[] newArray1;
 				}
+
+				delete[] gaps; delete sedgewicksize;
+
 				time = double((clock() - start - 1000 * timecopy - 1000 * timedelete) / 1000);
 				cout << fixed << time << endl;
 			}

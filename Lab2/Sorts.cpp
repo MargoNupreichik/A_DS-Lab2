@@ -60,7 +60,7 @@ void MergeSort(int* A, unsigned low, unsigned high)
 	merge(A, low, mid, high);
 }
 // +
-void QuickSort(int* A, unsigned size) 
+void QuickSort(int* A, unsigned size)
 {
 	int i = 0;
 	int j = size - 1;
@@ -107,36 +107,41 @@ void ShellSort1(int* A, unsigned size)
 		}
 	}
 }
-// Седжвик
-void ShellSort2(int* A, unsigned l, unsigned r)
+// + Седжвик
+void ShellSort2(int* A, unsigned* gaps, unsigned size, unsigned* rsize)
 {
-	int h;
-	for (h = 1; h <= (r - l) / 9; h = 3 * h + 1);
-	for (; h > 0; h /= 3)
-		for (int i = l + h; i <= r; i++)
+	int i1, i, j; unsigned reallen;
+	int gap, temp;
+	for (i1 = 0; i1 < *rsize; i1++) {
+		gap = gaps[i1];
+		for (i = gap; i < size; i += 1)
 		{
-			int j = i; int v = A[i];
-			while (j >= l + h && v < A[j - h])
-			{
-				A[j] = A[j - h]; j -= h;
-			}
-			A[j] = v;
+			temp = A[i];
+			j = 0;
+			for (j = i; j >= gap && A[j - gap] > temp; j -= gap)
+				A[j] = A[j - gap];
+
+			A[j] = temp;
 		}
+
+	}
 }
-// Хиббард
+// + Хиббард
 void ShellSort3(int* A, unsigned size) {
-	for (int i = 1; i < size; i++) {
-		int d = exp2(i) - 1;
-		if (d <= size)  
-			for (int k = 0; k < size - d; k++) {
-				int j = k;
-				while (j >= 0 && A[j] > A[j + d]) {
-					int number = A[j];
-					A[j] = A[j + d];
-					A[j + d] = number;
-					j--;
-				}
-			}
+	unsigned gap, i, j; int temp;
+	unsigned loged = log2(size) + 1;
+	for (; loged != 0; loged--)
+	{
+		gap = pow(2, loged) - 1;
+		for (i = gap; i < size; i += 1)
+		{
+			temp = A[i];
+			j = 0;
+			for (j = i; j >= gap && A[j - gap] > temp; j -= gap)
+				A[j] = A[j - gap];
+
+			A[j] = temp;
+		}
 	}
 }
 // +
@@ -155,19 +160,18 @@ void HeapSort(int* A, unsigned begin, unsigned end)
 // +
 void TimSort(int* A, unsigned sizeup)
 {
-	for (int i = 0; i < sizeup; i += RUN)
+	for (unsigned i = 0; i < sizeup; i += RUN)
 		InsertionSort(A, i, minn((i + RUN - 1), (sizeup - 1)));
 
-	for (int size = RUN; size < sizeup; size *= 2) { // при попытке отследить, что происходит при заходе в цикл, программа падает
-		// соообщение следующее: запись в память вне буфера
+	for (unsigned size = RUN; size < sizeup; size *= 2) { 
 
 		for (unsigned left = 0; left < sizeup; left += 2 * size) {
 
-			int mid = left + size - 1;
-			int right = minn((left + 2 * size - 1), (sizeup - 1));
+			unsigned mid = left + size - 1;
+			unsigned right = minn((left + 2 * size - 1), (sizeup - 1));
 
 			if (mid < right) {
-				merge(A, left, mid, right);  
+				merge(A, left, mid, right);
 			}
 		}
 	}
@@ -326,4 +330,24 @@ unsigned medianofthree(unsigned a, unsigned b, unsigned c)
 
 	if (c <= b && b <= a)
 		return b;
+}
+
+unsigned* sedgewickgaps(int size, unsigned* realsize) {
+	unsigned* gaparr = new unsigned[size];
+	int i = 1; int j = 0;
+	gaparr[j] = i;
+	j++;
+	while (i < size) {
+		i = pow(4, j) + 3 * pow(2, j - 1) + 1;
+		gaparr[j] = i;
+		j++;
+	}
+	unsigned reallen = j;
+	unsigned* revgaparr = new unsigned[reallen];
+	for (i = 0; i < reallen; i++) {
+		revgaparr[i] = gaparr[reallen - i - 1];
+	}
+	delete[] gaparr;
+	*realsize = reallen;
+	return revgaparr;
 }
