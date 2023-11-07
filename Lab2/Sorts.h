@@ -18,7 +18,6 @@ void merge(int* A, int low, int mid, int high);
 unsigned partition(int* A, unsigned start, unsigned end);
 void heapify(int* A, int N, int i);
 int minn(int a, int b);
-unsigned medianofthree(unsigned a, unsigned b, unsigned c);
 unsigned* sedgewickgaps(int size, unsigned* realsize);
 
 void SelectionSort(int* A, unsigned N);

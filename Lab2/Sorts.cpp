@@ -311,27 +311,6 @@ int minn(int a, int b) {
 	else return a;
 }
 
-unsigned medianofthree(unsigned a, unsigned b, unsigned c)
-{
-	if (a < b && b < c)
-		return b;
-
-	if (a < c && c <= b)
-		return c;
-
-	if (b <= a && a < c)
-		return a;
-
-	if (b < c && c <= a)
-		return c;
-
-	if (c <= a && a < b)
-		return a;
-
-	if (c <= b && b <= a)
-		return b;
-}
-
 unsigned* sedgewickgaps(int size, unsigned* realsize) {
 	unsigned* gaparr = new unsigned[size];
 	int i = 1; int j = 0;
